@@ -112,9 +112,25 @@ const updateCategory = async (req, res, next) => {
   }
 };
 
+const createDefaultCategories = async (userId) => {
+  const defaultCategories = [
+    { name: 'Tiền điện', icon: 'bolt', color: '#ffbf00', user: userId },
+    { name: 'Tiền nước', icon: 'tint', color: '#4422ff', user: userId },
+    { name: 'Ăn uống', icon: 'cutlery', color: '#de3163', user: userId },
+    { name: 'Phí giao lưu', icon: 'beer', color: '#40E0D0', user: userId },
+    { name: 'Đi lại', icon: 'car', color: '#fa8072', user: userId },
+    { name: 'Tiền nhà', icon: 'home', color: '#3b5998', user: userId },
+    { name: 'Phí liên lạc', icon: 'mobile', color: '#65041d', user: userId },
+    { name: 'Mua sắm', icon: 'shopping-cart', color: '#FF3333', user: userId }
+  ];
+
+  await Category.insertMany(defaultCategories);
+};
+
 module.exports = {
   getCategoriesByUser,
   deleteCategory,
   createCategory,
-  updateCategory
+  updateCategory,
+  createDefaultCategories
 };

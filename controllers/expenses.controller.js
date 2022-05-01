@@ -58,7 +58,7 @@ const deleteExpenses = async (req, res, next) => {
 /**
  * Create expenses
  * @route POST api/expenses/create
- * @body money, category, createdAt
+ * @body money, category, createdAt, note
  */
 const createExpenses = async (req, res, next) => {
   req.body.user = req.user._id;

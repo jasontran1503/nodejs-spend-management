@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const createError = require('http-errors');
 const User = require('../models/user.model');
+const { createDefaultCategories } = require('./category.controller');
 
 /**
  * Register
@@ -17,6 +18,7 @@ const register = async (req, res, next) => {
       throw new Error('Tên đã tồn tại');
     }
     const user = await User.create({ username, password });
+    createDefaultCategories(user._id);
 
     return res.status(200).json({
       success: true,
