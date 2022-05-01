@@ -24,7 +24,7 @@ const category = [
 ];
 
 const expenses = [
-  fieldsRequired('money', 'Số tiền'),
+  fieldsRequired('money', 'Số tiền').isInt({ min: 1 }).withMessage('Số tiền phải lớn hơn 0'),
   fieldsRequired('createdAt', 'Ngày'),
   body('category').notEmpty().withMessage('Chưa chọn danh mục'),
   handleValidationErrors
