@@ -6,6 +6,7 @@ const validation = require('../helpers/validation.helper');
 const auth = require('../middlewares/auth.middleware');
 
 router.get('/', auth.guard, expensesController.getAllExpenses);
+router.get('/single', auth.guard, expensesController.getSingleExpenses);
 router.post('/create', auth.guard, validation.expenses, expensesController.createExpenses);
 router.put('/update', auth.guard, validation.expenses, expensesController.updateExpenses);
 router.delete('/delete', auth.guard, expensesController.deleteExpenses);

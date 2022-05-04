@@ -27,6 +27,31 @@ const getAllExpenses = async (req, res, next) => {
 };
 
 /**
+ * Get single expenses
+ * @route GET api/expenses/single
+ * @params expensesId
+ */
+const getSingleExpenses = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      throw createError.Unauthorized('Không tìm thấy user');
+    }
+
+    const data = await Expenses.findOne({ user: req.user._id, _id: req.query.expensesId }).populate(
+      'category'
+    );
+    return res.status(200).json({
+      success: true,
+      message: '',
+      data
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * Delete expenses
  * @route POST api/expenses/delete
  * @params expensesId
@@ -113,12 +138,15 @@ const updateExpenses = async (req, res, next) => {
 
     const expenses = await Expenses.findOneAndUpdate(
       { user: req.user._id, _id: req.query.expensesId },
-      req.body,
+      {
+        ...req.body,
+        createdAt: convertDate(req.body.createdAt)
+      },
       {
         new: true,
         runValidators: true
       }
-    );
+    ).populate('category');
     if (!expenses) {
       throw createError.BadRequest('Khoản chi đã bị xóa hoặc không tồn tại');
     }
@@ -183,14 +211,37 @@ const reportMonthlyExpenses = async (req, res, next) => {
       throw createError.Unauthorized('Không tìm thấy user');
     }
 
-    const monthlyExpensesList = await Expenses.find({
+    let monthlyExpensesList = await Expenses.find({
       user: req.user._id,
       createdAt: { $gte: fromDate, $lte: toDate }
-    }).populate('category');
+    })
+      .populate('category')
+      .lean();
 
     const totalMoney = monthlyExpensesList.reduce((a, b) => {
       return a + b.money;
     }, 0);
+
+    monthlyExpensesList = [
+      ...monthlyExpensesList
+        .reduce((map, item) => {
+          const key = item.category._id;
+          const prev = map.get(key);
+
+          map.set(
+            key,
+            !prev
+              ? item
+              : {
+                  ...item,
+                  money: prev.money + item.money
+                }
+          );
+
+          return map;
+        }, new Map())
+        .values()
+    ];
 
     return res.status(200).json({
       success: true,
@@ -211,5 +262,6 @@ module.exports = {
   createExpenses,
   updateExpenses,
   reportDailyExpenses,
-  reportMonthlyExpenses
+  reportMonthlyExpenses,
+  getSingleExpenses
 };
