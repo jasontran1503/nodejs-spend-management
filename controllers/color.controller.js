@@ -2,7 +2,7 @@ const Color = require('../models/color.model');
 
 const getColors = async (req, res, next) => {
   try {
-    const colors = await Color.find({});
+    const colors = await Color.find({}).sort({ name: 'desc' });
     return res.status(200).json({
       success: true,
       message: '',

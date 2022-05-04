@@ -2,7 +2,7 @@ const Icon = require('../models/icon.model');
 
 const getIcons = async (req, res, next) => {
   try {
-    const icons = await Icon.find({});
+    const icons = await Icon.find({}).sort({ name: 'asc' });
     return res.status(200).json({
       success: true,
       message: '',
