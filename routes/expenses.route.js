@@ -12,5 +12,6 @@ router.put('/update', auth.guard, validation.expenses, expensesController.update
 router.delete('/delete', auth.guard, expensesController.deleteExpenses);
 router.get('/daily', auth.guard, expensesController.reportDailyExpenses);
 router.get('/monthly', auth.guard, expensesController.reportMonthlyExpenses);
+router.get('/monthly/detail', auth.guard, expensesController.getExpensesInMonthByCategory);
 
 module.exports = router;
