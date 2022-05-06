@@ -1,6 +1,7 @@
 const createError = require('http-errors');
 const Category = require('../models/category.model');
 const User = require('../models/user.model');
+const Expenses = require('../models/expenses.model');
 
 /**
  * Get categories by user
@@ -40,9 +41,19 @@ const deleteCategory = async (req, res, next) => {
       user: req.user._id,
       _id: req.query.categoryId
     });
+
     if (!category) {
       throw createError.BadRequest('Không tìm thấy danh mục');
     }
+    
+    await Expenses.updateMany(
+      {
+        user: req.user._id,
+        category: req.query.categoryId
+      },
+      { $set: { category: null } }
+    );
+    
     return res.status(200).json({
       success: true,
       message: 'Xóa thành công',
