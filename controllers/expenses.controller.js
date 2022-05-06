@@ -2,7 +2,7 @@ const Expenses = require('../models/expenses.model');
 const User = require('../models/user.model');
 const Category = require('../models/category.model');
 const createError = require('http-errors');
-const { convertDate } = require('../helpers/convert-date.helper');
+const { convertDate, getRangeDateByMonth } = require('../helpers/date.helper');
 
 /**
  * Get all expenses by user
@@ -194,16 +194,12 @@ const reportDailyExpenses = async (req, res, next) => {
 };
 
 /**
- * Report daily expenses
+ * Report monthly expenses
  * @route GET api/expenses/monthly
  * @params date
  */
 const reportMonthlyExpenses = async (req, res, next) => {
-  let fromDate = new Date(req.query.date);
-  let toDate = new Date(fromDate.getFullYear(), fromDate.getMonth() + 1, 0);
-
-  fromDate = convertDate(fromDate);
-  toDate = convertDate(toDate);
+  const { fromDate, toDate } = getRangeDateByMonth(req.query.date);
 
   try {
     const user = await User.findById(req.user._id);
@@ -225,7 +221,7 @@ const reportMonthlyExpenses = async (req, res, next) => {
     monthlyExpensesList = [
       ...monthlyExpensesList
         .reduce((map, item) => {
-          const key = item.category._id;
+          const key = item.category && item.category._id;
           const prev = map.get(key);
 
           map.set(
@@ -256,6 +252,37 @@ const reportMonthlyExpenses = async (req, res, next) => {
   }
 };
 
+/**
+ * Get expenses in month
+ * @route GET api/expenses/monthly/detail
+ * @params date, categoryId
+ */
+const getExpensesInMonthByCategory = async (req, res, next) => {
+  const { date, categoryId } = req.query;
+  const { fromDate, toDate } = getRangeDateByMonth(date);
+
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      throw createError.Unauthorized('Không tìm thấy user');
+    }
+
+    const data = await Expenses.find({
+      user: req.user._id,
+      category: require('mongoose').Types.ObjectId.isValid(categoryId) ? categoryId : null,
+      createdAt: { $gte: fromDate, $lte: toDate }
+    }).populate('category');
+
+    return res.status(200).json({
+      success: true,
+      message: '',
+      data
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getAllExpenses,
   deleteExpenses,
@@ -263,5 +290,6 @@ module.exports = {
   updateExpenses,
   reportDailyExpenses,
   reportMonthlyExpenses,
-  getSingleExpenses
+  getSingleExpenses,
+  getExpensesInMonthByCategory
 };
