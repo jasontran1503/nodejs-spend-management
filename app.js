@@ -24,7 +24,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: 'https://wondrous-syrniki-83dace.netlify.app',
+    origin: 'https://fabulous-bavarois-a3cf3e.netlify.app',
     allowedHeaders: 'Origin, X-Requested-With, X-Api-Key, Content-Type, Accept, Authorization',
     methods: 'GET, POST, PUT, DELETE'
   })
