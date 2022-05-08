@@ -24,7 +24,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: 'https://fabulous-bavarois-a3cf3e.netlify.app',
+    origin: 'https://www.sothuchi.online',
     allowedHeaders: 'Origin, X-Requested-With, X-Api-Key, Content-Type, Accept, Authorization',
     methods: 'GET, POST, PUT, DELETE'
   })
